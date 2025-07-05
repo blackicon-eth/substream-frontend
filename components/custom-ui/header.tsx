@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { Loader2, Menu, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/shadcn-ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/shadcn-ui/sheet";
 import Link from "next/link";
+import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
+import { truncateAddress } from "@/lib/utils";
+import { useNames } from "../contexts/names-provider";
 
 const navigationLinks = [
   { name: "Home", href: "/" },
@@ -17,6 +20,9 @@ const navigationLinks = [
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isConnected, address } = useAppKitAccount();
+  const { open } = useAppKit();
+  const { userNames } = useNames();
 
   return (
     <header className="absolute top-0 bg-black border-b border-orange-500/20 w-full z-50 sm:px-6 px-2 h-[66px] sm:h-[80px]">
@@ -102,11 +108,72 @@ export default function Header() {
         </nav>
 
         {/* CTA Button - Right side on both mobile and desktop */}
-        <div className="flex items-center">
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-4 py-2 transition-all duration-200 hover:scale-105">
-            Connect
-          </Button>
-        </div>
+
+        <Button
+          className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-4 py-2 transition-all duration-200 hover:scale-104 overflow-hidden"
+          onClick={() => {
+            if (isConnected) {
+              open({
+                view: "Account",
+              });
+            } else {
+              open({ view: "Connect" });
+            }
+          }}
+        >
+          <AnimatePresence mode="wait">
+            {!isConnected ? (
+              <motion.div
+                key="connect"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="cursor-pointer"
+              >
+                Connect
+              </motion.div>
+            ) : userNames.isFetching ? (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center gap-2"
+              >
+                <Loader2 className="w-4 h-4 animate-spin" />
+              </motion.div>
+            ) : userNames.ens ? (
+              <motion.div
+                key={userNames.ens}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                {userNames.ens}
+                <img
+                  src={userNames.ensAvatar}
+                  alt="ENS"
+                  className="w-5 h-5 sm:w-6 sm:h-6 object-cover rounded-full"
+                />
+              </motion.div>
+            ) : isConnected && address ? (
+              <motion.div
+                key={address}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                {truncateAddress(address)}
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+        </Button>
       </div>
     </header>
   );

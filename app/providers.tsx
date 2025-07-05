@@ -1,6 +1,7 @@
 "use client";
 
 import AppKitProvider from "@/components/contexts/appkit-provider";
+import { NamesProvider } from "@/components/contexts/names-provider";
 import { NavigationProvider } from "@/components/contexts/navigation-provider";
 
 export default function Providers({
@@ -12,7 +13,9 @@ export default function Providers({
 }) {
   return (
     <AppKitProvider cookies={cookies}>
-      <NavigationProvider>{children}</NavigationProvider>
+      <NamesProvider>
+        <NavigationProvider>{children}</NavigationProvider>
+      </NamesProvider>
     </AppKitProvider>
   );
 }
