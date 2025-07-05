@@ -3,7 +3,11 @@ import { z } from "zod";
 
 // https://env.t3.gg/docs/nextjs
 export const env = createEnv({
-  server: {},
+  server: {
+    // TURSO
+    TURSO_DATABASE_URL: z.string().min(1),
+    TURSO_AUTH_TOKEN: z.string().min(1),
+  },
   client: {
     // NEXT.JS
     NEXT_PUBLIC_URL: z.string().min(1),

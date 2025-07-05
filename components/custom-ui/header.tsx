@@ -12,7 +12,7 @@ import { truncateAddress } from "@/lib/utils";
 import { useNames } from "../contexts/names-provider";
 
 const navigationLinks = [
-  { name: "Home", href: "/", disabledIfDisconnected: false },
+  { name: "Subdomain", href: "/", disabledIfDisconnected: false },
   { name: "Transactions", href: "/transactions", disabledIfDisconnected: true },
 ];
 

@@ -2,50 +2,20 @@
 
 import type React from "react";
 
-import { useEffect, useState } from "react";
-import { Loader2, Globe, CheckCircle, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { Globe, CheckCircle, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/shadcn-ui/button";
-import { Input } from "@/components/shadcn-ui/input";
 import { Card, CardContent } from "@/components/shadcn-ui/card";
 import Link from "next/link";
-import ky from "ky";
-import { toast } from "sonner";
-import { useIntmaxClient } from "@/components/contexts/intmax-client-provider";
-
-interface SubdomainResponse {
-  newSubdomain: string;
-}
+import SubdomainForm from "@/components/custom-ui/subdomain-form";
+import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
+import { Button } from "@/components/shadcn-ui/button";
 
 export default function Home() {
   const [requestedSubdomain, setRequestedSubdomain] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [newSubdomain, setNewSubdomain] = useState<string>();
-  const { isLoggedIn } = useIntmaxClient();
-
-  useEffect(() => {
-    console.log("isLoggedIn", isLoggedIn);
-  }, [isLoggedIn]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!requestedSubdomain.trim()) return;
-
-    setIsLoading(true);
-
-    try {
-      const response = await ky
-        .post("/api/create-subdomain", { json: { name: requestedSubdomain } })
-        .json<SubdomainResponse>();
-
-      setNewSubdomain(response.newSubdomain);
-    } catch (error) {
-      toast.error("Failed to create subdomain. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { isConnected } = useAppKitAccount();
+  const { open } = useAppKit();
 
   return (
     <div className="pt-12 px-4 sm:px-0 pb-16 sm:pb-0">
@@ -77,94 +47,65 @@ export default function Home() {
 
         {/* Subdomain Form */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="max-w-2xl mx-auto"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="max-w-xl mx-auto"
         >
-          <Card className="bg-gray-900/50 border-orange-500/20 backdrop-blur-sm">
-            <CardContent className="px-8">
-              {!newSubdomain && (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex-1">
-                      <div className="relative">
-                        <Input
-                          type="text"
-                          placeholder="Enter your desired name"
-                          value={requestedSubdomain}
-                          onChange={(e) => setRequestedSubdomain(e.target.value)}
-                          className="bg-black/50 border-gray-700 text-white placeholder-gray-400 focus:border-orange-500 focus:ring-orange-500/20 pr-32 h-12 text-lg"
-                          disabled={isLoading}
-                        />
-                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
-                          .substream.eth
-                        </div>
-                      </div>
-                    </div>
-                    <Button
-                      type="submit"
-                      disabled={isLoading || !requestedSubdomain.trim()}
-                      className="bg-orange-500 hover:bg-orange-600 text-white font-medium h-12 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
-                      style={{ width: "170px", minWidth: "170px", flexShrink: 0 }}
-                    >
-                      {isLoading ? (
-                        <div className="flex items-center gap-2">
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                          Creating...
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <Globe className="w-5 h-5" />
-                          Get Subdomain
-                        </div>
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              )}
-
-              {/* Result Display */}
+          <Card className="bg-gray-900/50 border-orange-500/20 backdrop-blur-sm overflow-hidden w-full">
+            <CardContent className="flex justify-center items-center px-8 w-full">
               <AnimatePresence mode="wait">
-                {newSubdomain && (
+                {!isConnected ? (
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
+                    key="not-connected"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="mt-6"
+                    className="w-full"
                   >
-                    {newSubdomain ? (
-                      <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
-                        <div className="flex items-center gap-3 mb-2">
-                          <CheckCircle className="w-5 h-5 text-green-400" />
-                          <h3 className="text-green-400 font-semibold">Success!</h3>
-                        </div>
-                        <p className="text-white mb-3">
-                          Your subdomain has been created successfully:
-                        </p>
-                        <div className="bg-black/30 rounded-md p-3 mb-4">
-                          <code className="text-orange-400 text-lg font-mono">
-                            {newSubdomain}.substream.eth
-                          </code>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
-                        <div className="flex items-center gap-3 mb-2">
-                          <AlertCircle className="w-5 h-5 text-red-400" />
-                          <h3 className="text-red-400 font-semibold">Error</h3>
-                        </div>
-                        <p className="text-white mb-3">Something went wrong. Please try again.</p>
-                        <Button
-                          variant="outline"
-                          className="border-gray-600 text-gray-300 hover:bg-gray-800 bg-transparent"
-                        >
-                          Try Again
-                        </Button>
-                      </div>
-                    )}
+                    <Button
+                      className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-4 py-2 transition-all duration-200 hover:scale-102 w-full cursor-pointer"
+                      onClick={() => {
+                        if (isConnected) {
+                          open({
+                            view: "Account",
+                          });
+                        } else {
+                          open({ view: "Connect" });
+                        }
+                      }}
+                    >
+                      Connect Wallet
+                    </Button>
                   </motion.div>
+                ) : newSubdomain ? (
+                  <motion.div
+                    key="result"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-green-900/20 border border-green-500/30 rounded-lg p-4 w-full"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <CheckCircle className="w-5 h-5 text-green-400" />
+                      <h3 className="text-green-400 font-semibold">Success!</h3>
+                    </div>
+                    <p className="text-white mb-3">Your subdomain has been created successfully:</p>
+                    <div className="bg-black/30 rounded-md p-3 mb-4">
+                      <code className="text-orange-400 text-lg font-mono">
+                        {newSubdomain}.substream.eth
+                      </code>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <SubdomainForm
+                    key="form"
+                    requestedSubdomain={requestedSubdomain}
+                    setRequestedSubdomain={setRequestedSubdomain}
+                    setNewSubdomain={setNewSubdomain}
+                  />
                 )}
               </AnimatePresence>
             </CardContent>

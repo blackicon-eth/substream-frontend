@@ -6,10 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "frames": "frames",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:push": "drizzle-kit push",
+    "db:pull": "drizzle-kit pull"
   },
   "dependencies": {
     "@ensdomains/ensjs": "^4.0.2",
+    "@libsql/client": "^0.15.9",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-slot": "^1.2.3",
     "@reown/appkit": "^1.7.12",
@@ -20,6 +27,9 @@
     "@wagmi/core": "^2.17.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.0.1",
+    "drizzle-kit": "^0.31.4",
+    "drizzle-orm": "^0.44.2",
     "framer-motion": "^12.23.0",
     "intmax2-client-sdk": "^1.4.1",
     "ky": "^1.8.1",
