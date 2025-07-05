@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -27,6 +27,7 @@
     "next": "15.3.5",
     "next-themes": "^0.4.6",
     "ogl": "^1.0.11",
+    "pino-pretty": "^13.0.0",
     "public": "link:@ensdomains/ensjs/public",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
