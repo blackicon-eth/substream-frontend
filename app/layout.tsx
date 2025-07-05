@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/custom-ui/header";
 import Providers from "./providers";
 import { Toaster } from "sonner";
+import { cookies } from "next/headers";
+import Header from "@/components/custom-ui/header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,17 +21,23 @@ export const metadata: Metadata = {
   description: "Substream is a platform for generating your intmax ens subdomain",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const cookieString = cookieStore
+    .getAll()
+    .map((c: any) => `${c.name}=${c.value}`)
+    .join("; ");
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} size-full text-white antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} size-full text-white bg-black antialiased`}
       >
-        <Providers>
+        <Providers cookies={cookieString}>
+          <Header />
           {children}
           <Toaster richColors position="top-center" />
         </Providers>

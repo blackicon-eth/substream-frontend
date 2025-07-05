@@ -1,31 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/shadcn-ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/shadcn-ui/sheet";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
 import { truncateAddress } from "@/lib/utils";
 import { useNames } from "../contexts/names-provider";
 
 const navigationLinks = [
-  { name: "Home", href: "/" },
-  { name: "About", href: "/about" },
-  { name: "Services", href: "/services" },
-  { name: "Portfolio", href: "/portfolio" },
-  { name: "Contact", href: "/contact" },
+  { name: "Home", href: "/", disabledIfDisconnected: false },
+  { name: "Transactions", href: "/transactions", disabledIfDisconnected: true },
 ];
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const { isConnected, address } = useAppKitAccount();
+  const { isConnected, address, status } = useAppKitAccount();
   const { open } = useAppKit();
   const { userNames } = useNames();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Redirect to home page when wallet disconnects
+  useEffect(() => {
+    if (!isConnected && pathname !== "/") {
+      router.push("/");
+    }
+  }, [isConnected, pathname, router]);
 
   return (
-    <header className="absolute top-0 bg-black border-b border-orange-500/20 w-full z-50 sm:px-6 px-2 h-[66px] sm:h-[80px]">
+    <header className="sticky top-0 bg-gray-900/50 border-b border-orange-500/70 w-full z-50 sm:px-6 px-2 h-[66px] sm:h-[80px]">
       <div className="flex items-center justify-between h-16 sm:h-20">
         {/* Mobile: Hamburger Menu */}
         <div className="sm:hidden">
@@ -97,10 +104,18 @@ export default function Header() {
               <li key={link.name}>
                 <Link
                   href={link.href}
-                  className="text-white hover:text-orange-500 transition-colors duration-200 font-medium relative group"
+                  className={`text-white hover:text-orange-500 transition-colors duration-200 font-medium relative group ${
+                    link.disabledIfDisconnected && !isConnected
+                      ? "opacity-50 cursor-default hover:text-white"
+                      : ""
+                  }`}
                 >
                   {link.name}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-200 group-hover:w-full"></span>
+                  <span
+                    className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-200 group-hover:w-full ${
+                      link.disabledIfDisconnected && !isConnected ? "opacity-0" : ""
+                    }`}
+                  ></span>
                 </Link>
               </li>
             ))}
@@ -122,7 +137,7 @@ export default function Header() {
           }}
         >
           <AnimatePresence mode="wait">
-            {!isConnected ? (
+            {!isConnected || status === "connecting" || status === "reconnecting" ? (
               <motion.div
                 key="connect"
                 initial={{ opacity: 0 }}

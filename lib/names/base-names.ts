@@ -57,7 +57,7 @@ export const getBaseName = async (address: Address) => {
     return (basename as string) ?? "";
   } catch (error) {
     // Handle the error accordingly
-    console.log("Error getting Base Name from address", error);
+    console.log("Error getting Base Name from address");
     return "";
   }
 };

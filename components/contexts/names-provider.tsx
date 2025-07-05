@@ -51,7 +51,7 @@ export const NamesProvider = ({ children }: { children: ReactNode }) => {
         setConnectedUserEns(ens);
         setConnectedUserEnsAvatar(ensAvatar);
       } catch (error) {
-        console.error("Error getting ENS name", error);
+        console.error("Error getting ENS names");
       } finally {
         setIsFetchingUserNames(false);
       }
