@@ -11,7 +11,12 @@
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-slot": "^1.2.3",
+    "@reown/appkit": "^1.7.12",
+    "@reown/appkit-adapter-wagmi": "^1.7.12",
+    "@reown/appkit-common": "^1.7.12",
     "@t3-oss/env-nextjs": "^0.13.8",
+    "@tanstack/react-query": "^5.81.5",
+    "@wagmi/core": "^2.17.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.0",
@@ -22,6 +27,8 @@
     "react-dom": "^19.0.0",
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",
+    "viem": "^2.31.7",
+    "wagmi": "^2.15.6",
     "zod": "^3.25.74"
   },
   "devDependencies": {
