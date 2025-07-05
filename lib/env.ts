@@ -17,11 +17,15 @@ export const env = createEnv({
 
     // ALCHEMY API KEY
     NEXT_PUBLIC_ALCHEMY_API_KEY: z.string().min(1),
+
+    // TEE PUBLIC URL
+    NEXT_PUBLIC_TEE_URL: z.string().min(1),
   },
   // For Next.js >= 13.4.4, you only need to destructure client variables:
   experimental__runtimeEnv: {
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     NEXT_PUBLIC_REOWN_APP_ID: process.env.NEXT_PUBLIC_REOWN_APP_ID,
     NEXT_PUBLIC_ALCHEMY_API_KEY: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
+    NEXT_PUBLIC_TEE_URL: process.env.NEXT_PUBLIC_TEE_URL,
   },
 });

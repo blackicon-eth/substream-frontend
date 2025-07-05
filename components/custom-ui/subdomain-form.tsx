@@ -6,29 +6,26 @@ import { useIntmaxClient } from "../contexts/intmax-client-provider";
 import { toast } from "sonner";
 import ky from "ky";
 import { useEffect, useState } from "react";
+import { useRegisteredUser } from "../contexts/user-provider";
+import { useAppKitAccount } from "@reown/appkit/react";
+import { env } from "@/lib/env";
 
 interface SubdomainResponse {
   newSubdomain: string;
 }
 
 interface SubdomainFormProps {
-  requestedSubdomain: string;
-  setRequestedSubdomain: (subdomain: string) => void;
   setNewSubdomain: (subdomain: string) => void;
 }
 
-export default function SubdomainForm({
-  requestedSubdomain,
-  setRequestedSubdomain,
-  setNewSubdomain,
-}: SubdomainFormProps) {
+export default function SubdomainForm({ setNewSubdomain }: SubdomainFormProps) {
+  const [requestedSubdomain, setRequestedSubdomain] = useState("");
   const [isCreatingSubdomain, setIsCreatingSubdomain] = useState(false);
   const { isLoggedIn, login, client } = useIntmaxClient();
+  const { refetchUser } = useRegisteredUser();
+  const { address } = useAppKitAccount();
 
-  useEffect(() => {
-    console.log("client address", client?.address);
-  }, [client?.address]);
-
+  // Handle the form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!requestedSubdomain.trim()) return;
@@ -40,11 +37,20 @@ export default function SubdomainForm({
     }
 
     try {
-      const response = await ky
-        .post("/api/create-subdomain", { json: { name: requestedSubdomain } })
-        .json<SubdomainResponse>();
+      // Call the TEE to register the subdomain
+      await ky.post(`/api/register`, {
+        json: { subname: requestedSubdomain, intmax_address: client?.address },
+      });
 
-      setNewSubdomain(response.newSubdomain);
+      setNewSubdomain(`${requestedSubdomain}.substream.eth`);
+
+      // Update the user with the subdomain in the database
+      await ky
+        .put("/api/user/update", {
+          json: { evmAddress: address, subdomain: `${requestedSubdomain}.substream.eth` },
+        })
+        .json();
+      refetchUser();
     } catch (error) {
       toast.error("Failed to create subdomain. Please try again.");
     } finally {
@@ -57,9 +63,9 @@ export default function SubdomainForm({
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
       <form onSubmit={handleSubmit} className="space-y-6">

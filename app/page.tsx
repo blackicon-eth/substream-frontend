@@ -3,18 +3,20 @@
 import type React from "react";
 
 import { useState } from "react";
-import { Globe, CheckCircle, AlertCircle } from "lucide-react";
+import { Globe, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/shadcn-ui/card";
 import Link from "next/link";
 import SubdomainForm from "@/components/custom-ui/subdomain-form";
+import CopyButton from "@/components/custom-ui/copy-button";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
 import { Button } from "@/components/shadcn-ui/button";
+import { useRegisteredUser } from "@/components/contexts/user-provider";
 
 export default function Home() {
-  const [requestedSubdomain, setRequestedSubdomain] = useState("");
   const [newSubdomain, setNewSubdomain] = useState<string>();
   const { isConnected } = useAppKitAccount();
+  const { user, isLoadingUser } = useRegisteredUser();
   const { open } = useAppKit();
 
   return (
@@ -47,15 +49,26 @@ export default function Home() {
 
         {/* Subdomain Form */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
           className="max-w-xl mx-auto"
         >
           <Card className="bg-gray-900/50 border-orange-500/20 backdrop-blur-sm overflow-hidden w-full">
             <CardContent className="flex justify-center items-center px-8 w-full">
               <AnimatePresence mode="wait">
-                {!isConnected ? (
+                {isLoadingUser ? (
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full flex justify-center items-center"
+                  >
+                    <Loader2 className="w-7 h-7 text-orange-500 animate-spin" />
+                  </motion.div>
+                ) : !isConnected ? (
                   <motion.div
                     key="not-connected"
                     initial={{ opacity: 0 }}
@@ -93,19 +106,28 @@ export default function Home() {
                       <h3 className="text-green-400 font-semibold">Success!</h3>
                     </div>
                     <p className="text-white mb-3">Your subdomain has been created successfully:</p>
-                    <div className="bg-black/30 rounded-md p-3 mb-4">
-                      <code className="text-orange-400 text-lg font-mono">
-                        {newSubdomain}.substream.eth
-                      </code>
+                    <div className="relative bg-black/30 rounded-md p-3 mb-4 flex items-center justify-center">
+                      <code className="text-orange-400 text-lg font-mono">{newSubdomain}</code>
+                      <CopyButton text={`${newSubdomain}`} size="md" className="absolute right-3" />
+                    </div>
+                  </motion.div>
+                ) : !isLoadingUser && !newSubdomain && user?.subdomain ? (
+                  <motion.div
+                    key="existing-subdomain"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-green-900/20 border border-green-500/30 rounded-lg p-4 w-full"
+                  >
+                    <p className="text-white mb-3">Your claimed subdomain is:</p>
+                    <div className="relative bg-black/30 rounded-md p-3 mb-4 flex items-center justify-center">
+                      <code className="text-orange-400 text-lg font-mono">{user.subdomain}</code>
+                      <CopyButton text={user.subdomain} size="md" className="absolute right-3" />
                     </div>
                   </motion.div>
                 ) : (
-                  <SubdomainForm
-                    key="form"
-                    requestedSubdomain={requestedSubdomain}
-                    setRequestedSubdomain={setRequestedSubdomain}
-                    setNewSubdomain={setNewSubdomain}
-                  />
+                  <SubdomainForm key="form" setNewSubdomain={setNewSubdomain} />
                 )}
               </AnimatePresence>
             </CardContent>

@@ -18,6 +18,7 @@ export const PUT = async (request: NextRequest) => {
     const user = await updateUser(evmAddress, {
       subdomain: subdomain || existingUser.subdomain,
       intmaxAddress: intmaxAddress || existingUser.intmaxAddress,
+      updatedAt: new Date().toISOString(),
     });
     return NextResponse.json(user);
   } catch (error) {

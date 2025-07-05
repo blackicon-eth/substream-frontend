@@ -13,7 +13,7 @@ import { useNames } from "../contexts/names-provider";
 
 const navigationLinks = [
   { name: "Subdomain", href: "/", disabledIfDisconnected: false },
-  { name: "Transactions", href: "/transactions", disabledIfDisconnected: true },
+  { name: "Transfers", href: "/transfers", disabledIfDisconnected: true },
 ];
 
 export default function Header() {
