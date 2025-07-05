@@ -9,56 +9,40 @@ import { Button } from "@/components/shadcn-ui/button";
 import { Input } from "@/components/shadcn-ui/input";
 import { Card, CardContent } from "@/components/shadcn-ui/card";
 import Link from "next/link";
+import ky from "ky";
+import { toast } from "sonner";
 
 interface SubdomainResponse {
-  success: boolean;
-  subdomain?: string;
-  message?: string;
-  error?: string;
+  newSubdomain: string;
 }
 
 export default function Home() {
-  const [subdomainName, setSubdomainName] = useState("");
+  const [requestedSubdomain, setRequestedSubdomain] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<SubdomainResponse | null>(null);
+  const [newSubdomain, setNewSubdomain] = useState<string>();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!subdomainName.trim()) return;
+    if (!requestedSubdomain.trim()) return;
 
     setIsLoading(true);
-    setResult(null);
 
     try {
-      // Simulate API call - replace with your actual API endpoint
-      const response = await fetch("/api/create-subdomain", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: subdomainName }),
-      });
+      const response = await ky
+        .post("/api/create-subdomain", { json: { name: requestedSubdomain } })
+        .json<SubdomainResponse>();
 
-      const data: SubdomainResponse = await response.json();
-      setResult(data);
+      setNewSubdomain(response.newSubdomain);
     } catch (error) {
-      setResult({
-        success: false,
-        error: "Failed to create subdomain. Please try again.",
-      });
+      toast.error("Failed to create subdomain. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const resetForm = () => {
-    setSubdomainName("");
-    setResult(null);
-  };
-
   return (
-    <div className="container mx-auto px-4 pt-12">
+    <div className="pt-12 px-4 sm:px-0 pb-16 sm:pb-0">
       <div className="max-w-4xl mx-auto text-center">
         {/* Hero Content */}
         <motion.div
@@ -94,46 +78,49 @@ export default function Home() {
         >
           <Card className="bg-gray-900/50 border-orange-500/20 backdrop-blur-sm">
             <CardContent className="px-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Input
-                        type="text"
-                        placeholder="Enter your desired name"
-                        value={subdomainName}
-                        onChange={(e) => setSubdomainName(e.target.value)}
-                        className="bg-black/50 border-gray-700 text-white placeholder-gray-400 focus:border-orange-500 focus:ring-orange-500/20 pr-32 h-12 text-lg"
-                        disabled={isLoading}
-                      />
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
-                        .substream.io
+              {!newSubdomain && (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex-1">
+                      <div className="relative">
+                        <Input
+                          type="text"
+                          placeholder="Enter your desired name"
+                          value={requestedSubdomain}
+                          onChange={(e) => setRequestedSubdomain(e.target.value)}
+                          className="bg-black/50 border-gray-700 text-white placeholder-gray-400 focus:border-orange-500 focus:ring-orange-500/20 pr-32 h-12 text-lg"
+                          disabled={isLoading}
+                        />
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
+                          .substream.eth
+                        </div>
                       </div>
                     </div>
+                    <Button
+                      type="submit"
+                      disabled={isLoading || !requestedSubdomain.trim()}
+                      className="bg-orange-500 hover:bg-orange-600 text-white font-medium h-12 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
+                      style={{ width: "170px", minWidth: "170px", flexShrink: 0 }}
+                    >
+                      {isLoading ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Creating...
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Globe className="w-5 h-5" />
+                          Get Subdomain
+                        </div>
+                      )}
+                    </Button>
                   </div>
-                  <Button
-                    type="submit"
-                    disabled={isLoading || !subdomainName.trim()}
-                    className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-8 h-12 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Creating...
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <Globe className="w-5 h-5" />
-                        Get Subdomain
-                      </div>
-                    )}
-                  </Button>
-                </div>
-              </form>
+                </form>
+              )}
 
               {/* Result Display */}
               <AnimatePresence mode="wait">
-                {result && (
+                {newSubdomain && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -141,7 +128,7 @@ export default function Home() {
                     transition={{ duration: 0.3 }}
                     className="mt-6"
                   >
-                    {result.success ? (
+                    {newSubdomain ? (
                       <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
                         <div className="flex items-center gap-3 mb-2">
                           <CheckCircle className="w-5 h-5 text-green-400" />
@@ -152,25 +139,8 @@ export default function Home() {
                         </p>
                         <div className="bg-black/30 rounded-md p-3 mb-4">
                           <code className="text-orange-400 text-lg font-mono">
-                            {result.subdomain}.substream.io
+                            {newSubdomain}.substream.eth
                           </code>
-                        </div>
-                        <div className="flex gap-3">
-                          <Button
-                            onClick={() =>
-                              window.open(`https://${result.subdomain}.substream.io`, "_blank")
-                            }
-                            className="bg-orange-500 hover:bg-orange-600 text-white"
-                          >
-                            Visit Site
-                          </Button>
-                          <Button
-                            onClick={resetForm}
-                            variant="outline"
-                            className="border-gray-600 text-gray-300 hover:bg-gray-800 bg-transparent"
-                          >
-                            Create Another
-                          </Button>
                         </div>
                       </div>
                     ) : (
@@ -179,13 +149,8 @@ export default function Home() {
                           <AlertCircle className="w-5 h-5 text-red-400" />
                           <h3 className="text-red-400 font-semibold">Error</h3>
                         </div>
-                        <p className="text-white mb-3">
-                          {result.error ||
-                            result.message ||
-                            "Something went wrong. Please try again."}
-                        </p>
+                        <p className="text-white mb-3">Something went wrong. Please try again.</p>
                         <Button
-                          onClick={resetForm}
                           variant="outline"
                           className="border-gray-600 text-gray-300 hover:bg-gray-800 bg-transparent"
                         >

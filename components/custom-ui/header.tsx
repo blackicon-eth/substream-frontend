@@ -32,34 +32,29 @@ export default function Header() {
   }, [isConnected, pathname, router]);
 
   return (
-    <header className="sticky top-0 bg-gray-900/50 border-b border-orange-500/70 w-full z-50 sm:px-6 px-2 h-[66px] sm:h-[80px]">
-      <div className="flex items-center justify-between h-16 sm:h-20">
+    <header className="sticky top-0 bg-gray-900/90 border-b border-orange-500/70 w-full z-50 sm:px-6 px-2 h-[66px] sm:h-[80px]">
+      <div className="flex items-center justify-between h-16 sm:h-20 w-full">
         {/* Mobile: Hamburger Menu */}
         <div className="sm:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger className="flex items-center justify-center">
               <Menu className="h-6 w-6 text-white" />
             </SheetTrigger>
-            <SheetContent side="left" className="bg-black border-orange-500/20 w-80">
-              <SheetTitle className="hidden">Substream</SheetTitle>
-              <div className="flex flex-col h-full">
+            <SheetContent
+              side="left"
+              className="bg-radial from-black to-gray-900 border-orange-500/20 w-80"
+            >
+              <SheetTitle>
                 {/* Mobile Menu Header */}
                 <div className="flex items-center justify-between py-4 pl-4 border-b border-orange-500/20">
                   <div className="text-2xl font-bold text-white">
                     <span className="text-orange-500">Sub</span>stream
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsOpen(false)}
-                    className="text-white hover:text-orange-500 hover:bg-orange-500/10"
-                  >
-                    <X className="h-6 w-6" />
-                  </Button>
                 </div>
-
+              </SheetTitle>
+              <div className="flex flex-col h-full">
                 {/* Mobile Navigation Links */}
-                <nav className="flex-1 py-6 pl-4">
+                <nav className="flex-1 py-1 pl-4">
                   <ul className="space-y-4">
                     {navigationLinks.map((link, index) => (
                       <motion.li

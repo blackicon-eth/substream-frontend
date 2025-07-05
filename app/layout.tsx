@@ -34,7 +34,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} size-full text-white bg-black antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen text-white bg-radial from-black to-gray-900 antialiased`}
       >
         <Providers cookies={cookieString}>
           <Header />
