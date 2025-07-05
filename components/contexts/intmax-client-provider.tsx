@@ -1,4 +1,4 @@
-import { IntMaxClient } from "intmax2-client-sdk";
+import { IntMaxClient, Transaction } from "intmax2-client-sdk";
 import {
   createContext,
   ReactNode,
@@ -18,6 +18,8 @@ export type IntmaxClientContextType = {
   error: string | null;
   login: () => Promise<void>;
   logout: () => Promise<void>;
+  userTransfers: Promise<Transaction[]>;
+  userDeposits: Promise<Transaction[]>;
 };
 
 export const useIntmaxClient = () => {
@@ -34,6 +36,7 @@ export const IntmaxClientProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Initialize the client on mount
   useEffect(() => {
     const initializeClient = async () => {
       try {
@@ -57,6 +60,7 @@ export const IntmaxClientProvider = ({ children }: { children: ReactNode }) => {
     initializeClient();
   }, []);
 
+  // Login the user
   const login = useCallback(async () => {
     if (!client) {
       setError("Client not initialized");
@@ -77,6 +81,7 @@ export const IntmaxClientProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [client]);
 
+  // Logout the user
   const logout = useCallback(async () => {
     if (!client) return;
 
@@ -94,6 +99,38 @@ export const IntmaxClientProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [client]);
 
+  // Get all the user's transfers
+  const userTransfers = useMemo(async () => {
+    if (!client) return [];
+    try {
+      const transfers = await client.fetchTransfers({
+        pageSize: 100,
+        sortOrder: "desc",
+        sortBy: "timestamp",
+      });
+      return transfers;
+    } catch (err) {
+      console.error("Failed to fetch transfers:", err);
+      return [];
+    }
+  }, [client]);
+
+  // Get all the user's deposits
+  const userDeposits = useMemo(async () => {
+    if (!client) return [];
+    try {
+      const deposits = await client.fetchDeposits({
+        pageSize: 100,
+        sortOrder: "desc",
+        sortBy: "timestamp",
+      });
+      return deposits;
+    } catch (err) {
+      console.error("Failed to fetch deposits:", err);
+      return [];
+    }
+  }, [client]);
+
   const value = useMemo(
     () => ({
       client,
@@ -102,8 +139,10 @@ export const IntmaxClientProvider = ({ children }: { children: ReactNode }) => {
       error,
       login,
       logout,
+      userTransfers,
+      userDeposits,
     }),
-    [client, isLoggedIn, loading, error, login, logout]
+    [client, isLoggedIn, loading, error, login, logout, userTransfers, userDeposits]
   );
 
   return <IntmaxClientContext.Provider value={value}>{children}</IntmaxClientContext.Provider>;
