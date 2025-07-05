@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Menu, X } from "lucide-react";
+import { Loader2, Menu } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/shadcn-ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/shadcn-ui/sheet";
@@ -32,7 +32,7 @@ export default function Header() {
   }, [isConnected, pathname, router]);
 
   return (
-    <header className="sticky top-0 bg-gray-900/90 border-b border-orange-500/70 w-full z-50 sm:px-6 px-2 h-[66px] sm:h-[80px]">
+    <header className="sticky top-0 bg-gradient-to-b from-black to-black/10 border-b border-orange-500/70 w-full z-50 sm:px-6 px-2 h-[66px] sm:h-[80px]">
       <div className="flex items-center justify-between h-16 sm:h-20 w-full">
         {/* Mobile: Hamburger Menu */}
         <div className="sm:hidden">
@@ -42,7 +42,7 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="bg-radial from-black to-gray-900 border-orange-500/20 w-80"
+              className="bg-radial from-black to-black/90 border-orange-500/20 w-80"
             >
               <SheetTitle>
                 {/* Mobile Menu Header */}

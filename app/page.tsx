@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2, Globe, CheckCircle, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/shadcn-ui/button";
@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/shadcn-ui/card";
 import Link from "next/link";
 import ky from "ky";
 import { toast } from "sonner";
+import { useIntmaxClient } from "@/components/contexts/intmax-client-provider";
 
 interface SubdomainResponse {
   newSubdomain: string;
@@ -20,6 +21,11 @@ export default function Home() {
   const [requestedSubdomain, setRequestedSubdomain] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [newSubdomain, setNewSubdomain] = useState<string>();
+  const { isLoggedIn } = useIntmaxClient();
+
+  useEffect(() => {
+    console.log("isLoggedIn", isLoggedIn);
+  }, [isLoggedIn]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

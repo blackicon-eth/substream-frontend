@@ -1,6 +1,7 @@
 "use client";
 
 import AppKitProvider from "@/components/contexts/appkit-provider";
+import { IntmaxClientProvider } from "@/components/contexts/intmax-client-provider";
 import { NamesProvider } from "@/components/contexts/names-provider";
 
 export default function Providers({
@@ -12,7 +13,9 @@ export default function Providers({
 }) {
   return (
     <AppKitProvider cookies={cookies}>
-      <NamesProvider>{children}</NamesProvider>
+      <IntmaxClientProvider>
+        <NamesProvider>{children}</NamesProvider>
+      </IntmaxClientProvider>
     </AppKitProvider>
   );
 }
