@@ -1,4 +1,4 @@
-# Substream 🚀
+# Substream 🤫
 
 Substream is a protocol that generates ENS subdomains for the user and that allows him to receive tokens directly into his Intmax account just by sharing his subdomain with other Ethereum users.
 
