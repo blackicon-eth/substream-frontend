@@ -30,7 +30,7 @@ export default function Home() {
           className="mb-12"
         >
           <h1 className="text-4xl sm:text-6xl font-bold text-white mb-6">
-            Get Your Personal
+            Get Your Privacy
             <span className="text-orange-500 block">Subdomain</span>
           </h1>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
