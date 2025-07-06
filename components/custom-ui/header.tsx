@@ -32,7 +32,7 @@ export default function Header() {
   }, [isConnected, pathname, router]);
 
   return (
-    <header className="sticky top-0 bg-gradient-to-b from-black to-black/10 border-b border-orange-500/70 w-full z-50 sm:px-6 px-2 h-[66px] sm:h-[80px]">
+    <header className="sticky top-0 bg-black border-b border-orange-500/70 w-full z-50 sm:px-6 px-2 h-[66px] sm:h-[80px]">
       <div className="flex items-center justify-between h-16 sm:h-20 w-full">
         {/* Mobile: Hamburger Menu */}
         <div className="sm:hidden">

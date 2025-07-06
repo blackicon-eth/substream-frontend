@@ -12,17 +12,25 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/shadcn-ui/pagination";
-import { ArrowUpRight, ArrowDownLeft, Loader2, Clock, Coins } from "lucide-react";
+import {
+  ArrowUpRight,
+  ArrowDownLeft,
+  Loader2,
+  Clock,
+  Coins,
+  CheckCircle,
+  Cross,
+} from "lucide-react";
 import { useIntmaxClient } from "@/components/contexts/intmax-client-provider";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useRouter } from "next/navigation";
-import type { Transaction } from "intmax2-client-sdk";
+import { TransactionStatus, type Transaction } from "intmax2-client-sdk";
 
 interface CombinedTransaction extends Transaction {
   type: "deposit" | "transfer";
 }
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 2;
 
 export default function TransactionsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -95,7 +103,7 @@ export default function TransactionsPage() {
 
   return (
     <div className="pt-12 px-4 sm:px-6 pb-16 sm:pb-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -154,7 +162,7 @@ export default function TransactionsPage() {
             >
               {/* Transactions List */}
               <div className="space-y-4">
-                <AnimatePresence mode="popLayout">
+                <AnimatePresence mode="wait">
                   {currentTransactions.map((transaction, index) => (
                     <motion.div
                       key={`${transaction.type}-${transaction.timestamp}-${index}`}
@@ -165,18 +173,18 @@ export default function TransactionsPage() {
                       layout
                     >
                       <Card className="bg-gray-900/50 border-orange-500/20 backdrop-blur-sm hover:border-orange-500/40 transition-all duration-300">
-                        <CardContent className="p-6">
+                        <CardContent className="px-6">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                               {/* Transaction Type Icon */}
                               <div
                                 className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                                  transaction.type === "deposit"
+                                  transaction.type === "transfer"
                                     ? "bg-green-500/10 text-green-400"
                                     : "bg-blue-500/10 text-blue-400"
                                 }`}
                               >
-                                {transaction.type === "deposit" ? (
+                                {transaction.type === "transfer" ? (
                                   <ArrowDownLeft className="w-6 h-6" />
                                 ) : (
                                   <ArrowUpRight className="w-6 h-6" />
@@ -192,7 +200,7 @@ export default function TransactionsPage() {
                                   <Badge
                                     variant="outline"
                                     className={`${
-                                      transaction.type === "deposit"
+                                      transaction.type === "transfer"
                                         ? "border-green-500/30 text-green-400"
                                         : "border-blue-500/30 text-blue-400"
                                     }`}
@@ -211,22 +219,74 @@ export default function TransactionsPage() {
                                   </span>
                                 </div>
 
-                                {/* Transaction Hash/ID */}
-                                {transaction.digest && (
+                                {/* Transaction From/To */}
+                                {transaction.from && (
                                   <div className="text-gray-500 text-xs mt-1 font-mono">
-                                    ID: {transaction.digest.slice(0, 20)}...
+                                    From: {transaction.from.slice(0, 20)}...
+                                  </div>
+                                )}
+                                {transaction.to && (
+                                  <div className="text-gray-500 text-xs mt-1 font-mono">
+                                    To: {transaction.to.slice(0, 20)}...
                                   </div>
                                 )}
                               </div>
                             </div>
 
                             {/* Amount */}
-                            <div className="text-right">
+                            <div className="text-right space-y-0.5">
                               <div className="text-white font-semibold text-lg">
                                 {transaction.amount ? formatAmount(transaction.amount) : "N/A"}
                               </div>
-                              <div className="text-gray-400 text-sm">
-                                {transaction.tokenAddress || "ETH"}
+                              <div className="flex items-center justify-end gap-3 text-gray-400 text-sm">
+                                <div
+                                  className={`flex justify-between items-center gap-1 px-2 py-1 rounded-full text-xs ${
+                                    transaction.status === TransactionStatus.Completed
+                                      ? "bg-green-400/10"
+                                      : transaction.status === TransactionStatus.Processing
+                                      ? "bg-blue-400/10"
+                                      : transaction.status === TransactionStatus.Rejected
+                                      ? "bg-red-400/10"
+                                      : transaction.status === TransactionStatus.ReadyToClaim
+                                      ? "bg-orange-400/10"
+                                      : transaction.status === TransactionStatus.NeedToClaim
+                                      ? "bg-orange-400/10"
+                                      : ""
+                                  }`}
+                                >
+                                  {transaction.status === TransactionStatus.Completed ? (
+                                    <>
+                                      <CheckCircle className="w-[14px] h-[14px] text-green-400" />
+                                      <span className="text-green-400">Completed</span>
+                                    </>
+                                  ) : transaction.status === TransactionStatus.Processing ? (
+                                    <>
+                                      <Loader2 className="w-[14px] h-[14px] text-blue-500 animate-spin" />
+                                      <span className="text-blue-500">Processing</span>
+                                    </>
+                                  ) : transaction.status === TransactionStatus.Rejected ? (
+                                    <>
+                                      <Cross className="w-[14px] h-[14px] text-red-400" />
+                                      <span className="text-red-400">Rejected</span>
+                                    </>
+                                  ) : transaction.status === TransactionStatus.ReadyToClaim ? (
+                                    <>
+                                      <Clock className="w-[14px] h-[14px] text-orange-500 animate-spin" />
+                                      <span className="text-orange-500">Ready to Claim</span>
+                                    </>
+                                  ) : transaction.status === TransactionStatus.NeedToClaim ? (
+                                    <>
+                                      <Clock className="w-[14px] h-[14px] text-orange-500 animate-spin" />
+                                      <span className="text-orange-500">Need to Claim</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Clock className="w-[14px] h-[14px] text-orange-500 animate-spin" />
+                                      <span>Unknown</span>
+                                    </>
+                                  )}
+                                </div>
+                                <span className="text-gray-400 text-base">ETH</span>
                               </div>
                             </div>
                           </div>
@@ -294,29 +354,29 @@ export default function TransactionsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.3 }}
-                className="mt-8"
+                className="absolute top-[68px] right-4 z-10"
               >
-                <Card className="bg-gray-900/30 border-gray-700/50">
-                  <CardHeader>
-                    <CardTitle className="text-white text-lg">Summary</CardTitle>
+                <Card className="bg-gray-900/30 border-gray-700/50 backdrop-blur-sm">
+                  <CardHeader className="hidden">
+                    <CardTitle>Summary</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                  <CardContent className="px-5">
+                    <div className="grid grid-cols-3 gap-3 text-center">
                       <div>
-                        <div className="text-2xl font-bold text-white">{transactions.length}</div>
-                        <div className="text-gray-400 text-sm">Total Transactions</div>
+                        <div className="text-lg font-bold text-white">{transactions.length}</div>
+                        <div className="text-gray-400 text-xs">Total</div>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-green-400">
+                        <div className="text-lg font-bold text-green-400">
                           {transactions.filter((tx) => tx.type === "deposit").length}
                         </div>
-                        <div className="text-gray-400 text-sm">Deposits</div>
+                        <div className="text-gray-400 text-xs">Deposits</div>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-blue-400">
+                        <div className="text-lg font-bold text-blue-400">
                           {transactions.filter((tx) => tx.type === "transfer").length}
                         </div>
-                        <div className="text-gray-400 text-sm">Transfers</div>
+                        <div className="text-gray-400 text-xs">Transfers</div>
                       </div>
                     </div>
                   </CardContent>
