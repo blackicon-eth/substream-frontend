@@ -1,10 +1,10 @@
 # Substream 🤫
 
-Substream is a protocol that generates ENS subdomains for the user and that allows him to receive tokens directly into his Intmax account just by sharing his subdomain with other Ethereum users.
+Substream is a protocol that generates ENS subdomains for the user and that allows him to receive tokens directly into his Intmax account just by sharing his subdomain with others.
 
 ## How is it made?
 
-SubStream is a protocol designed to streamline user interactions for those who want to receive payments into IntMax while maintaining a familiar Ethereum-like experience. Built with Next.js and containerized using Docker, the system leverages Oasis Trusted Execution Environment (TEE) for secure transaction processing.
+SubStream is designed to streamline user interactions for those who want to receive payments into IntMax while maintaining a familiar Ethereum-like experience. Built with Next.js and containerized using Docker, the system leverages Oasis Trusted Execution Environment (TEE) for secure transaction processing.
 
 Users can register personalized ENS subdomains under the project's primary domain, with resolution addresses managed by an Oasis TEE instance. When Bob registers bob.stealthmax.eth, he receives an identifier that Alice can use to send Ether. Behind the scenes, Oasis TEE initializes an Intmax client session and processes transactions to Bob's Intmax address, stored in the ENS Text Record, while implementing privacy through new resolution address derivation for each payment.
 
