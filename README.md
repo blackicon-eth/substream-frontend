@@ -33,7 +33,7 @@ pnpm install && pnpm dev
 
 ## Useful links
 
-- [ETHGlobal]()
+- [ETHGlobal](https://ethglobal.com/showcase/substream-msjk1)
 - [Vercel Deployed dApp](https://substream-frontend.vercel.app/)
 - [Node.js TEE Repository](https://github.com/SolidityDrone/substream)
 

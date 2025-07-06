@@ -28,7 +28,6 @@ import { useRouter } from "next/navigation";
 import { TransactionStatus, type Transaction } from "intmax2-client-sdk";
 import { Button } from "@/components/shadcn-ui/button";
 import { formatTimestamp, formatAmount } from "@/lib/utils";
-import { mockDeposits, mockTransfers } from "@/lib/constants";
 
 interface CombinedTransaction extends Transaction {
   type: "deposit" | "transfer";
@@ -65,11 +64,11 @@ export default function TransactionsPage() {
 
       setLoading(true);
       try {
-        //const [transfers, deposits] = await Promise.all([userTransfers, userDeposits]);
+        const [transfers, deposits] = await Promise.all([userTransfers, userDeposits]);
 
         const combinedTransactions: CombinedTransaction[] = [
-          ...mockTransfers.map((tx) => ({ ...tx, type: "transfer" as const })),
-          ...mockDeposits.map((tx) => ({ ...tx, type: "deposit" as const })),
+          ...transfers.map((tx) => ({ ...tx, type: "transfer" as const })),
+          ...deposits.map((tx) => ({ ...tx, type: "deposit" as const })),
         ];
 
         // Sort by timestamp (most recent first)
