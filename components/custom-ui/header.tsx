@@ -56,22 +56,27 @@ export default function Header() {
                 {/* Mobile Navigation Links */}
                 <nav className="flex-1 py-1 pl-4">
                   <ul className="space-y-4">
-                    {navigationLinks.map((link, index) => (
-                      <motion.li
-                        key={link.name}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <Link
-                          href={link.href}
-                          className="block text-lg font-medium text-white hover:text-orange-500 transition-colors duration-200 py-2"
-                          onClick={() => setIsOpen(false)}
+                    {navigationLinks.map((link, index) => {
+                      const isActive = pathname === link.href;
+                      return (
+                        <motion.li
+                          key={link.name}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
                         >
-                          {link.name}
-                        </Link>
-                      </motion.li>
-                    ))}
+                          <Link
+                            href={link.href}
+                            className={`block text-lg font-medium transition-colors duration-200 py-2 ${
+                              isActive ? "text-orange-500" : "text-white hover:text-orange-500"
+                            }`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {link.name}
+                          </Link>
+                        </motion.li>
+                      );
+                    })}
                   </ul>
                 </nav>
               </div>
@@ -95,25 +100,37 @@ export default function Header() {
         {/* Desktop Navigation - Hidden on mobile */}
         <nav className="hidden sm:flex flex-1 justify-center">
           <ul className="flex items-center space-x-8">
-            {navigationLinks.map((link) => (
-              <li key={link.name}>
-                <Link
-                  href={link.href}
-                  className={`text-white hover:text-orange-500 transition-colors duration-200 font-medium relative group ${
-                    link.disabledIfDisconnected && !isConnected
-                      ? "opacity-50 cursor-default hover:text-white"
-                      : ""
-                  }`}
-                >
-                  {link.name}
-                  <span
-                    className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-200 group-hover:w-full ${
-                      link.disabledIfDisconnected && !isConnected ? "opacity-0" : ""
+            {navigationLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className={`transition-colors duration-200 font-medium relative group ${
+                      link.disabledIfDisconnected && !isConnected
+                        ? "opacity-50 cursor-default text-white"
+                        : isActive
+                        ? "text-orange-500"
+                        : "text-white hover:text-orange-500"
                     }`}
-                  ></span>
-                </Link>
-              </li>
-            ))}
+                    onClick={(e) => {
+                      if (link.disabledIfDisconnected && !isConnected) {
+                        e.preventDefault();
+                      }
+                    }}
+                  >
+                    {link.name}
+                    <span
+                      className={`absolute -bottom-1 left-0 h-0.5 bg-orange-500 transition-all duration-200 ${
+                        link.disabledIfDisconnected && !isConnected
+                          ? "opacity-0 w-0 group-hover:w-full"
+                          : "w-0 group-hover:w-full"
+                      }`}
+                    ></span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 

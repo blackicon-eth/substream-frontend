@@ -101,7 +101,7 @@ export const IntmaxClientProvider = ({ children }: { children: ReactNode }) => {
 
   // Get all the user's transfers
   const userTransfers = useMemo(async () => {
-    if (!client) return [];
+    if (!client?.address) return [];
     try {
       const transfers = await client.fetchTransfers({
         pageSize: 100,
@@ -113,11 +113,11 @@ export const IntmaxClientProvider = ({ children }: { children: ReactNode }) => {
       console.error("Failed to fetch transfers:", err);
       return [];
     }
-  }, [client]);
+  }, [client?.address]);
 
   // Get all the user's deposits
   const userDeposits = useMemo(async () => {
-    if (!client) return [];
+    if (!client?.address) return [];
     try {
       const deposits = await client.fetchDeposits({
         pageSize: 100,
@@ -129,7 +129,7 @@ export const IntmaxClientProvider = ({ children }: { children: ReactNode }) => {
       console.error("Failed to fetch deposits:", err);
       return [];
     }
-  }, [client]);
+  }, [client?.address]);
 
   const value = useMemo(
     () => ({
