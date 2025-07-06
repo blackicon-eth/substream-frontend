@@ -14,7 +14,7 @@ export const mockTransfers: Transaction[] = [
     timestamp: Date.now() - 180000, // 3 minutes ago
     amount: "0.001",
     tokenAddress: "ETH",
-    status: TransactionStatus.Processing,
+    status: TransactionStatus.Completed,
     from: "T5YpaxZnKfT8s7DdFqGbCZqRjPWGvpB1nEktXNdR9uj6d6aPRLsXnHmb3vQpM9RwTu6VTVKjJjPX8ySZnvGoUjzefyc4m9",
     to: "T8BSmuBQihR5yMaWhbujyVQ6Miagw6uwLUhXraQ5HqYfeUeaJK3AusPXze33b1HG1eCubAUTqy5cHWnGHWtengcdKgr2iWp",
     transfers: [],
