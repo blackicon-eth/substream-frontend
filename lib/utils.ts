@@ -33,3 +33,23 @@ export const getViemPublicClient = (chain: Chain) => {
     ),
   });
 };
+
+/**
+ * Formats a timestamp to a human readable string
+ * @param timestamp - The timestamp to format
+ * @returns The formatted timestamp
+ */
+export const formatTimestamp = (timestamp: string | number) => {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+};
+
+/**
+ * Formats an amount to a human readable string
+ * @param amount - The amount to format
+ * @returns The formatted amount
+ */
+export const formatAmount = (amount: string | number) => {
+  const num = typeof amount === "string" ? Number.parseFloat(amount) : amount;
+  return num.toFixed(6);
+};

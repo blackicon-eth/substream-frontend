@@ -5,14 +5,9 @@ import { Globe, Loader2 } from "lucide-react";
 import { useIntmaxClient } from "../contexts/intmax-client-provider";
 import { toast } from "sonner";
 import ky from "ky";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRegisteredUser } from "../contexts/user-provider";
 import { useAppKitAccount } from "@reown/appkit/react";
-import { env } from "@/lib/env";
-
-interface SubdomainResponse {
-  newSubdomain: string;
-}
 
 interface SubdomainFormProps {
   setNewSubdomain: (subdomain: string) => void;
@@ -42,12 +37,12 @@ export default function SubdomainForm({ setNewSubdomain }: SubdomainFormProps) {
         json: { subname: requestedSubdomain, intmax_address: client?.address },
       });
 
-      setNewSubdomain(`${requestedSubdomain}.substream.eth`);
+      setNewSubdomain(`${requestedSubdomain}.stealthmax.eth`);
 
       // Update the user with the subdomain in the database
       await ky
         .put("/api/user/update", {
-          json: { evmAddress: address, subdomain: `${requestedSubdomain}.substream.eth` },
+          json: { evmAddress: address, subdomain: `${requestedSubdomain}.stealthmax.eth` },
         })
         .json();
       refetchUser();
@@ -81,7 +76,7 @@ export default function SubdomainForm({ setNewSubdomain }: SubdomainFormProps) {
                 disabled={isCreatingSubdomain}
               />
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
-                .substream.eth
+                .stealthmax.eth
               </div>
             </div>
           </div>

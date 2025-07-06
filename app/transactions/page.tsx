@@ -19,24 +19,34 @@ import {
   Clock,
   Coins,
   CheckCircle,
-  Cross,
+  X,
+  Globe,
 } from "lucide-react";
 import { useIntmaxClient } from "@/components/contexts/intmax-client-provider";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useRouter } from "next/navigation";
 import { TransactionStatus, type Transaction } from "intmax2-client-sdk";
+import { Button } from "@/components/shadcn-ui/button";
+import { formatTimestamp, formatAmount } from "@/lib/utils";
 
 interface CombinedTransaction extends Transaction {
   type: "deposit" | "transfer";
 }
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 5;
 
 export default function TransactionsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [transactions, setTransactions] = useState<CombinedTransaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const { userTransfers, userDeposits, client } = useIntmaxClient();
+  const {
+    userTransfers,
+    userDeposits,
+    client,
+    login,
+    isLoggedIn,
+    loading: isLoadingClient,
+  } = useIntmaxClient();
   const { isConnected } = useAppKitAccount();
   const router = useRouter();
 
@@ -79,23 +89,16 @@ export default function TransactionsPage() {
     fetchTransactions();
   }, [userTransfers, userDeposits, client]);
 
+  // Handle login
+  const handleLogin = () => {
+    login();
+  };
+
   // Calculate pagination
   const totalPages = Math.ceil(transactions.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentTransactions = transactions.slice(startIndex, endIndex);
-
-  // Format timestamp
-  const formatTimestamp = (timestamp: string | number) => {
-    const date = new Date(timestamp);
-    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
-  };
-
-  // Format amount
-  const formatAmount = (amount: string | number) => {
-    const num = typeof amount === "string" ? Number.parseFloat(amount) : amount;
-    return num.toFixed(6);
-  };
 
   if (!isConnected) {
     return null;
@@ -119,7 +122,39 @@ export default function TransactionsPage() {
 
         {/* Loading State */}
         <AnimatePresence mode="wait">
-          {loading ? (
+          {!isLoggedIn ? (
+            <motion.div
+              key="signin"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="flex flex-col gap-4 justify-center items-center py-16"
+            >
+              <Button
+                type="submit"
+                disabled={isLoadingClient}
+                className="bg-orange-500 hover:bg-orange-600 text-white font-medium h-12 transition-all duration-200 hover:scale-103 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
+                style={{ width: "150px", minWidth: "150px", flexShrink: 0 }}
+                onClick={handleLogin}
+              >
+                {isLoadingClient ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Signing in...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-5 h-5" />
+                    Sign in
+                  </div>
+                )}
+              </Button>
+              <div className="text-gray-400 text-sm">
+                You need to sign in to view your transactions
+              </div>
+            </motion.div>
+          ) : loading ? (
             <motion.div
               key="loading"
               initial={{ opacity: 0 }}
@@ -140,7 +175,7 @@ export default function TransactionsPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="text-center py-20"
+              className="text-center py-16"
             >
               <div className="w-16 h-16 bg-radial from-gray-800 to-black/10 border border-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Coins className="w-8 h-8 text-gray-400" />
@@ -266,22 +301,22 @@ export default function TransactionsPage() {
                                     </>
                                   ) : transaction.status === TransactionStatus.Rejected ? (
                                     <>
-                                      <Cross className="w-[14px] h-[14px] text-red-400" />
+                                      <X className="w-[14px] h-[14px] text-red-400" />
                                       <span className="text-red-400">Rejected</span>
                                     </>
                                   ) : transaction.status === TransactionStatus.ReadyToClaim ? (
                                     <>
-                                      <Clock className="w-[14px] h-[14px] text-orange-500 animate-spin" />
+                                      <Clock className="w-[14px] h-[14px] text-orange-500" />
                                       <span className="text-orange-500">Ready to Claim</span>
                                     </>
                                   ) : transaction.status === TransactionStatus.NeedToClaim ? (
                                     <>
-                                      <Clock className="w-[14px] h-[14px] text-orange-500 animate-spin" />
+                                      <Clock className="w-[14px] h-[14px] text-orange-500" />
                                       <span className="text-orange-500">Need to Claim</span>
                                     </>
                                   ) : (
                                     <>
-                                      <Clock className="w-[14px] h-[14px] text-orange-500 animate-spin" />
+                                      <Clock className="w-[14px] h-[14px] text-gray-400" />
                                       <span>Unknown</span>
                                     </>
                                   )}

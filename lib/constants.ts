@@ -26,7 +26,7 @@ export const mockTransfers: Transaction[] = [
     timestamp: Date.now() - 3600000, // 1 hour ago
     amount: "0.005",
     tokenAddress: "USDC",
-    status: TransactionStatus.Completed,
+    status: TransactionStatus.Rejected,
     from: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
     to: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
     transfers: [],
@@ -41,7 +41,7 @@ export const mockDeposits: Transaction[] = [
     timestamp: Date.now() - 172800000, // 2 days ago
     amount: "0.01",
     tokenAddress: "ETH",
-    status: TransactionStatus.Processing,
+    status: TransactionStatus.NeedToClaim,
     from: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
     to: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
     transfers: [],
